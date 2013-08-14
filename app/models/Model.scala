@@ -13,20 +13,18 @@ import play.Logger
  * Time: 12:04 PM
  */
 
-case class Book(bookId: Option[Int], title: String, author: String, released: Int,
-  keywords: String, coverImage: String)
+case class Book(bookId: Option[Int], title: String, author: String, released: Int, coverImage: String)
 
-case class putBook(title: String, author: String, released: Int, keywords: String, coverImage: String)
+case class putBook(title: String, author: String, released: Int, coverImage: String)
 
 object Books extends Table[Book]("books") {
   def bookId = column[Int]("book_id", O.PrimaryKey, O.AutoInc)
   def title = column[String]("title")
   def author = column[String]("author")
   def released = column[Int]("released")
-  def keywords = column[String]("keywords")
   def coverImage = column[String]("cover_image")
-  def * = bookId.? ~ title ~ author ~ released ~ keywords ~ coverImage <> (Book, Book.unapply _)
-  def autoInc = title ~ author ~ released ~ keywords ~ coverImage returning bookId
+  def * = bookId.? ~ title ~ author ~ released ~ coverImage <> (Book, Book.unapply _)
+  def autoInc = title ~ author ~ released ~ coverImage returning bookId
 
   def selectAll()(implicit s: Session): Seq[Book] = (for (b <- Books) yield b).to[Seq]
 
@@ -38,7 +36,7 @@ object Books extends Table[Book]("books") {
 //    Logger.debug(q)
 //    val bookId: Int = Books.forInsert.returning(Books.bookId).insert(newBook)
     // http://stackoverflow.com/questions/17634152/scala-play-slick-postgresql-auto-increment
-    val bookId: Int = Books.autoInc.insert(nb.title, nb.author, nb.released, nb.keywords, nb.coverImage)
+    val bookId: Int = Books.autoInc.insert(nb.title, nb.author, nb.released, nb.coverImage)
     bookId
   }
 
