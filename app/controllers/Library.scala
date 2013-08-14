@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import models.{putBook, Books, Book}
+import models.{PutBook, Books, Book}
 import models.Books.{bookFormat, putBookFormat}
 import play.api.libs.json.{JsObject, JsError, Json, JsArray}
 import play.api.Play.current
@@ -38,8 +38,8 @@ object Library extends Controller {
   }
 
   def putBook() = Action(parse.json) { request =>
-    request.body.validate[putBook].map {
-      case book: putBook => {
+    request.body.validate[PutBook].map {
+      case book: PutBook => {
         db.withSession { implicit s: Session =>
           val id: Int = Books.insertBook(book)
           Ok(Json.toJson(id))
