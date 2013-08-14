@@ -3,9 +3,11 @@ package controllers
 import play.api.mvc.{Action, Controller}
 import models.Books
 import models.Books.bookFormat
-import play.api.libs.json.{Json, JsArray}
+import models.Book
+import play.api.libs.json.{JsObject, JsError, Json, JsArray}
 import play.api.Play.current
 import scala.slick.session.Session
+import org.codehaus.jackson.annotate.JsonValue
 
 /**
  * books
@@ -35,7 +37,16 @@ object Library extends Controller {
     }
   }
 
-
-
-
+  def putBook() = Action(parse.json) { request =>
+    request.body.validate[Book].map {
+      case book: Book => {
+        db.withSession { implicit s: Session =>
+          val id: Int = Books.insertBook(book)
+          Ok(Json.toJson(id))
+        }
+      }
+    }.recoverTotal {
+      e => BadRequest("Detected Error: " + JsError.toFlatJson(e))
+    }
+  }
 }

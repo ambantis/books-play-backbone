@@ -14,25 +14,32 @@ import play.api.libs.json._
 case class Book(id: Int, title: String, author: String, releaseDate: Int,
   keywords: String, coverImage: String)
 
-object Books extends Table[Book]("BOOK") {
-  def id = column[Int]("ID", O.PrimaryKey)
+object Books extends Table[Book]("BOOKS") {
+  def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
   def title = column[String]("TITLE")
   def author = column[String]("AUTHOR")
   def released = column[Int]("RELEASE_DATE")
   def keywords = column[String]("KEYWORDS")
   def coverImage = column[String]("COVER_IMAGE")
   def * = id ~ title ~ author ~ released ~ keywords ~ coverImage <> (Book, Book.unapply _)
+//  def forInsert = title ~ author ~ released ~ keywords ~ coverImage <> (
+//      { t => Book(None, t._1, t._2, t._3, t._4, t._5)},
+//      { (b: Book) => Some((b.title, b.author, b.releaseDate, b.keywords, b.coverImage))})
+
+
 
   def selectAll()(implicit s: Session) = Query(Books).list()
 
-  def selectBook(id: Int)(implicit s: Session): Option[Book] = Query(Books).where(_.id === id).list().headOption
+  def selectBook(id: Int)(implicit s: Session): Option[Book] =
+    Query(Books).where(_.id === id).firstOption
 
-  def insertBook(newBook: Book)(implicit s: Session) {
-    Books.insert(newBook)
+  def insertBook(newBook: Book)(implicit s: Session): Int = {
+//    val bookId: Int = Books.forInsert.returning(Books.id).insert(newBook)
+//    bookId
+    1
   }
 
   def updateBook(id: Int, book: Book)(implicit s: Session) {
-    val bookToUpdate = Book(book.id, book.title, book.author, book.releaseDate, book.keywords, book.coverImage)
     Books.where(_.id === book.id).update(book)
   }
 
@@ -44,6 +51,15 @@ object Books extends Table[Book]("BOOK") {
 
   implicit val bookFormat = Format(Json.reads[Book], Json.writes[Book])
 }
+
+case class User(email: String, password: String)
+
+object Users extends Table[User]("USERS") {
+  def email = column[String]("ID", O.PrimaryKey)
+  def password = column[String]("PASSWORD")
+  def * = email ~ password <> (User, User.unapply _)
+}
+
 
 
 
