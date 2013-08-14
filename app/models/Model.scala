@@ -1,7 +1,8 @@
 package models
 
 import play.api.libs.json._
-import scala.slick.driver.PostgresDriver.simple._
+//import scala.slick.driver.PostgresDriver.simple._
+import scala.slick.driver.H2Driver.simple._
 import play.Logger
 
 /**

@@ -1,9 +1,10 @@
 
-import models.Books
+import models._
 import play.api.db.DB
 import play.api.{Logger, GlobalSettings, Application}
 import play.api.Play.current
-import scala.slick.driver.PostgresDriver.simple._
+import scala.slick.driver.H2Driver.simple._
+//import scala.slick.driver.PostgresDriver.simple._
 import Database.threadLocalSession
 
 object Global extends GlobalSettings {
