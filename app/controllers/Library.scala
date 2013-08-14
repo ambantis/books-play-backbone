@@ -1,13 +1,12 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import models.Books
-import models.Books.bookFormat
-import models.Book
+import models.{putBook, Books, Book}
+import models.Books.{bookFormat, putBookFormat}
 import play.api.libs.json.{JsObject, JsError, Json, JsArray}
 import play.api.Play.current
-import scala.slick.session.Session
-import org.codehaus.jackson.annotate.JsonValue
+import play.api.db.DB
+import scala.slick.driver.PostgresDriver.simple._
 
 /**
  * books
@@ -18,11 +17,11 @@ import org.codehaus.jackson.annotate.JsonValue
  */
 object Library extends Controller {
 
-  val db = play.api.db.slick.DB
+  lazy val db = Database.forDataSource(DB.getDataSource())
 
   def listBooks() = Action {
     db.withSession { implicit s: Session =>
-      val books = Books.selectAll().map(x => Json.toJson(x)).toSeq
+      val books = Books.selectAll().map(x => Json.toJson(x))
       Ok(JsArray(books))
     }
   }
@@ -38,8 +37,8 @@ object Library extends Controller {
   }
 
   def putBook() = Action(parse.json) { request =>
-    request.body.validate[Book].map {
-      case book: Book => {
+    request.body.validate[putBook].map {
+      case book: putBook => {
         db.withSession { implicit s: Session =>
           val id: Int = Books.insertBook(book)
           Ok(Json.toJson(id))

@@ -1,28 +1,35 @@
 
-import java.text.SimpleDateFormat
-import models.{Book, Books, User, Users}
+import models.Books
+import play.api.db.DB
 import play.api.{Logger, GlobalSettings, Application}
-import play.api.db.slick.{DB, Session}
 import play.api.Play.current
-
+import scala.slick.driver.PostgresDriver.simple._
+import Database.threadLocalSession
 
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
+
+    lazy val db = Database.forDataSource(DB.getDataSource())
+
+//    db.withSession {
+//      val ddl = Books.ddl
+//      ddl.create
+//    }
+
+
 //    InitialData.insert()
   }
 }
 
 object InitialData {
 
-  val sdf = new SimpleDateFormat("yyyy-MM-dd")
-
-  def insert() {
-    DB.withSession { implicit session: Session =>
-      Logger.debug("Starting up database")
-      Logger.debug(Books.ddl.createStatements.mkString)
-//      (Books.ddl ++ Users.ddl).create
-      Logger.debug("No books in database, initiating import of default records")
+//  def insert() {
+//    DB.withSession { implicit session: Session =>
+//      Logger.debug("Starting up database")
+////      Logger.debug(Books.ddl.createStatements.mkString)
+////      (Books.ddl ++ Users.ddl).create
+//      Logger.debug("No books in database, initiating import of default records")
 //      Seq(
 //        Book(None, "JavaScript: The Good Parts", "Douglas Crockford", 2008,
 //          "JavaScript Programming", "images/eloquent_javascript.png"),
@@ -36,6 +43,6 @@ object InitialData {
 //          "JavaScript Programming", "images/eloquent/javascript.png")
 //      ).foreach(Books.insertBook)
 //      Logger.debug("Completed import of default records")
-    }
-  }
+//    }
+//  }
 }
