@@ -1,37 +1,48 @@
 
-import java.text.SimpleDateFormat
-import models.{Book, Books}
-import play.api.{GlobalSettings, Application}
-import play.api.db.slick.{DB, Session}
+import models.Books
+import play.api.db.DB
+import play.api.{Logger, GlobalSettings, Application}
 import play.api.Play.current
-
+import scala.slick.driver.PostgresDriver.simple._
+import Database.threadLocalSession
 
 object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
-    InitialData.insert()
+
+    lazy val db = Database.forDataSource(DB.getDataSource())
+
+//    db.withSession {
+//      val ddl = Books.ddl
+//      ddl.create
+//    }
+
+
+//    InitialData.insert()
   }
 }
 
 object InitialData {
 
-  val sdf = new SimpleDateFormat("yyyy-MM-dd")
-
-  def insert() {
-    DB.withSession { implicit session: Session =>
-      if (Books.countBooks == 0)
-      Seq(
-        Book(1, "JavaScript: The Good Parts", "Douglas Crockford", 2008, "JavaScript Programming",
-            "images/eloquent_javascript.png"),
-        Book(2, "The Little Book on CoffeeScript", "Alex MacCaw", 2012, "CoffeeScript Programming",
-          "images/eloquent/javascript.png"),
-        Book(3, "Scala for the Impatient", "Cay S. Horstmann", 2012, "Scala Programming",
-          "images/eloquent/javascript.png"),
-        Book(4, "American Psycho", "Bret Easton Ellis", 2012, "CoffeeScript Programming",
-          "images/eloquent/javascript.png"),
-        Book(5, "Eloquent JavaScript", "Marijn Haverbeke", 2011, "JavaScript Programming",
-          "images/eloquent/javascript.png")
-      ).foreach(Books.insertBook)
-    }
-  }
+//  def insert() {
+//    DB.withSession { implicit session: Session =>
+//      Logger.debug("Starting up database")
+////      Logger.debug(Books.ddl.createStatements.mkString)
+////      (Books.ddl ++ Users.ddl).create
+//      Logger.debug("No books in database, initiating import of default records")
+//      Seq(
+//        Book(None, "JavaScript: The Good Parts", "Douglas Crockford", 2008,
+//          "JavaScript Programming", "images/eloquent_javascript.png"),
+//        Book(None, "The Little Book on CoffeeScript", "Alex MacCaw", 2012,
+//          "CoffeeScript Programming", "images/eloquent/javascript.png"),
+//        Book(None, "Scala for the Impatient", "Cay S. Horstmann", 2012,
+//          "Scala Programming", "images/eloquent/javascript.png"),
+//        Book(None, "American Psycho", "Bret Easton Ellis", 1991,
+//          "Crazy Bloodbath", "images/eloquent/javascript.png"),
+//        Book(None, "Eloquent JavaScript", "Marijn Haverbeke", 2011,
+//          "JavaScript Programming", "images/eloquent/javascript.png")
+//      ).foreach(Books.insertBook)
+//      Logger.debug("Completed import of default records")
+//    }
+//  }
 }
