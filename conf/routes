@@ -3,8 +3,12 @@
 # ~~~~
 
 # Home page
-GET       /app/books                    controllers.Library.listBooks()
-GET       /app/books/:id                controllers.Library.getBook(id: Int)
-POST      /app/books                    controllers.Library.putBook()
+GET           /app                  controllers.Application.index()
+GET           /app/books            controllers.Library.listBooks()
+POST          /app/books            controllers.Library.postBook()
+GET           /app/books/:id        controllers.Library.getBook(id: Int)
+PUT           /app/books/:id        controllers.Library.putBook(id: Int)
+DELETE        /app/books/:id        controllers.Library.deleteBook(id: Int)
+
 # Map static resources from the /public folder to the /assets URL path
-GET       /assets/*file        controllers.Assets.at(path="/public", file)
+GET           /assets/*file         controllers.Assets.at(path="/public", file)

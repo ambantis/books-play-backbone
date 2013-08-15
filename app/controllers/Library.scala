@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import models.{putBook, Books, Book}
+import models.{PutBook, Books, Book}
 import models.Books.{bookFormat, putBookFormat}
 import play.api.libs.json.{JsObject, JsError, Json, JsArray}
 import play.api.Play.current
@@ -36,9 +36,9 @@ object Library extends Controller {
     }
   }
 
-  def putBook() = Action(parse.json) { request =>
-    request.body.validate[putBook].map {
-      case book: putBook => {
+  def postBook() = Action(parse.json) { request =>
+    request.body.validate[PutBook].map {
+      case book: PutBook => {
         db.withSession { implicit s: Session =>
           val id: Int = Books.insertBook(book)
           Ok(Json.toJson(id))
@@ -48,4 +48,27 @@ object Library extends Controller {
       e => BadRequest("Detected Error: " + JsError.toFlatJson(e))
     }
   }
+
+  def putBook(id: Int) = Action(parse.json) { request =>
+    request.body.validate[Book].map {
+      case book: Book if book.id == Some(id) => {
+        db.withSession { implicit s: Session =>
+          val count = Books.updateBook(id, book)
+          if (count == 1) Ok("Update Successful")
+          else BadRequest("Unable to Save changes")
+        }
+      }
+    }.recoverTotal {
+      e => BadRequest("Detected Error: " + JsError.toFlatJson(e))
+    }
+  }
+
+  def deleteBook(id: Int) = Action {
+    db.withSession { implicit s: Session =>
+      val count = Books.deleteBook(id)
+      if (count == 1) Ok("Delete Successful")
+      else BadRequest("Unable to perform delete")
+    }
+  }
+
 }

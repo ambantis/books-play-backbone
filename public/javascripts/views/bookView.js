@@ -26,7 +26,7 @@ app.BookView = Backbone.View.extend({
   template: _.template($('#book-template').html()),
 
   render: function() {
-    this.$el.html(this.template(this.model.toJSON()));
+    this.$el.html(this.template($.extend({}, this.model.toJSON(), {"imageUri": this.model.imageUri(this.model)} )));
     return this;
   }
 });

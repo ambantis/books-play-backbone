@@ -15,5 +15,12 @@ app.Book = Backbone.Model.extend({
     author: 'Unknown',
     releaseDate: 'Unknown',
     keywords: 'None'
+  },
+
+  imageUri: function(me) {
+    var uri = "@routes.Assets.at(\"" + me.get('coverImage') + "\")";
+    console.log(uri);
+    return uri;
   }
+
 });
