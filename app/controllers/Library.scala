@@ -1,8 +1,9 @@
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import models.{PutBook, Books, Book}
+import models.{BooksWithTags, PutBook, Books, Book}
 import models.Books.{bookFormat, putBookFormat}
+import models.BooksWithTags.bookWithTagsFormat
 import play.api.libs.json.{JsObject, JsError, Json, JsArray}
 import play.api.Play.current
 import play.api.db.DB
@@ -21,7 +22,7 @@ object Library extends Controller {
 
   def listBooks() = Action {
     db.withSession { implicit s: Session =>
-      val books = Books.selectAll().map(x => Json.toJson(x))
+      val books = BooksWithTags.selectAll().map(x => Json.toJson(x)(bookWithTagsFormat))
       Ok(JsArray(books))
     }
   }
