@@ -11,7 +11,7 @@ import scala.slick.driver.PostgresDriver.simple._
  * Date: 8/13/13
  * Time: 12:04 PM
  */
-case class BookWithTag(bookId: Int, title: String, author: String, released: String, coverImage: String,
+case class BookWithTag(id: Int, title: String, author: String, released: String, coverImage: String,
                         keywords: List[String])
 
 object BooksWithTags {
@@ -19,32 +19,31 @@ object BooksWithTags {
   def selectAll()(implicit s: Session): List[BookWithTag] = {
     val books: List[Book] = Books.selectAll()
     val tags: Map[Int, List[String]] = BookTags.selectAllBookTagsWithName()
-    tags.getOrElse(books.head.bookId, Nil)
-    val booksWithTags: List[BookWithTag] = books.map(b => BookWithTag(b.bookId, b.title, b.author,
-      b.released, b.coverImage, tags.getOrElse(b.bookId, Nil)))
+    val booksWithTags: List[BookWithTag] = books.map(b => BookWithTag(b.id, b.title, b.author,
+      b.released, b.coverImage, tags.getOrElse(b.id, Nil)))
     booksWithTags
   }
   implicit val bookWithTagsFormat = Format(Json.reads[BookWithTag], Json.writes[BookWithTag])
 }
-case class ValidBook(bookId: Int, title: String, author: String, released: String, coverImage: String)
+case class ValidBook(id: Int, title: String, author: String, released: String, coverImage: String)
 
-case class Book(bookId: Int, title: String, author: String, released: String, coverImage: String)
+case class Book(id: Int, title: String, author: String, released: String, coverImage: String)
 
-case class PutBook(bookId: Option[Int], title: String, author: String, released: String, coverImage: String)
+case class PutBook(id: Option[Int], title: String, author: String, released: String, coverImage: String)
 
 object Books extends Table[Book]("books") {
-  def bookId = column[Int]("id", O.PrimaryKey, O.AutoInc)
+  def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
   def title = column[String]("title")
   def author = column[String]("author")
   def released = column[String]("released")
   def coverImage = column[String]("image")
-  def * = bookId ~ title ~ author ~ released ~ coverImage <> (Book, Book.unapply _)
-  def autoInc = title ~ author ~ released ~ coverImage returning bookId
+  def * = id ~ title ~ author ~ released ~ coverImage <> (Book, Book.unapply _)
+  def autoInc = title ~ author ~ released ~ coverImage returning id
 
   def selectAll()(implicit s: Session): List[Book] = (for (b <- Books) yield b).to[List]
 
   def selectBook(id: Int)(implicit s: Session): Option[Book] =
-    Query(Books).where(_.bookId === id).firstOption
+    Query(Books).where(_.id === id).firstOption
 
   def insertBook(nb: PutBook)(implicit s: Session): Int = {
     // http://stackoverflow.com/questions/17634152/scala-play-slick-postgresql-auto-increment
@@ -53,12 +52,10 @@ object Books extends Table[Book]("books") {
   }
 
   def updateBook(id: Int, book: Book)(implicit s: Session) {
-    Books.where(_.bookId === book.bookId).update(book)
+    Books.where(_.id === book.id).update(book)
   }
 
-  def deleteBook(id: Int)(implicit s: Session) {
-    Books.where(_.bookId === id).delete
-  }
+  def deleteBook(id: Int)(implicit s: Session): Int = Books.where(_.id === id).delete
 
   def countBooks()(implicit s: Session) = Query(Books.length).first
 
@@ -88,7 +85,7 @@ object BookTags extends Table[BookTag]("book_tags") {
   def tId = column[Int]("tag_id")
   def * = bId ~ tId <> (BookTag, BookTag.unapply _)
   def pk = primaryKey("pk_a", (bId, tId))
-  def book = foreignKey("book_id", bId, Books)(_.bookId)
+  def book = foreignKey("book_id", bId, Books)(_.id)
   def tag = foreignKey("tag_id", tId, Tags)(_.tagId)
 
   def selectAllBookTagsWithName()(implicit s: Session): Map[Int, List[String]] = {
